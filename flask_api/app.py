@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 #product Class/Model
-class Person(db.Model):
+class Product(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(120),unique=True)
     description = db.Column(db.String(200))
@@ -36,6 +36,55 @@ class ProductSchema(ma.Schema):
 #Initialising schema
 product_schema = ProductSchema()
 products_schema = ProductSchema(many=True)
+
+# Create a product route
+@app.route('/product',methods=['POST'])
+
+def add_product():
+    name = request.json['name']
+    description = request.json['description']
+    price = request.json['price']
+    qty = request.json['qty']
+    
+    new_product = Product(name,description,price,qty)
+
+    db.session.add(new_product)
+    db.session.commit()
+
+    return product_schema.jsonify(new_product)
+
+# Get All Product
+@app.route('/product',methods=['GET'])
+def get_products():
+    all_products = Product.query.all()
+    result = products_schema.dump(all_products)
+    return jsonify(result)
+
+# Get single Product
+@app.route('/product/<id>',methods=['GET'])
+def get_product(id):
+    product = Product.query.get(id)
+    return product_schema.jsonify(product)
+
+# update an existing product route
+@app.route('/product/<id>',methods=['PUT'])
+
+def update_product(id):
+    product = Product.query.get(id)
+    # geting the field of the schema
+    name = request.json['name']
+    description = request.json['description']
+    price = request.json['price']
+    qty = request.json['qty']
+    
+    product.name = name
+    product.description = description
+    product.price = price
+    product.qty = qty
+    
+    db.session.commit()
+
+    return product_schema.jsonify(product)
 
 
 #  # add a sample test rout
