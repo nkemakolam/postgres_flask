@@ -8,3 +8,4 @@ CREATE TABLE users
 )
 
 SELECT * FROM  users
+delete * from  users where  id!=1
