@@ -8,16 +8,22 @@ connection_pool = pool.SimpleConnectionPool(
     host='localhost'
 )
 
-class ConnectFromPool:
+class CursorFromConnectFromPool:
     #create a connection 
     def __init__(self):
         self.connection = None
+        self.cursor = None
     
     #pick a connection from the pool
     def __enter__(self):
         self.connection = connection_pool.getconn()
-        return self.connection
+        self.cursor = self.connection.cursor()
+        return self.cursor
     # exiting the connection to releae resource
     def __exit__(self,exc_type,exc_value,exc_tb):
-        self.connection.commit()
+        if exc_value is not None:
+            self.connection.rollback()
+        else:
+            self.cursor.close()
+            self.connection.commit()
         connection_pool.putconn(self.connection)
