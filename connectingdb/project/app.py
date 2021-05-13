@@ -1,7 +1,7 @@
 from database import Database
 from user import User
 
-Database.initialise()
+Database.initialise(user='nkemakolam',password='ghosts123',database='learning',host='localhost')
 my_user = User ('Raymond@gmail.com','maxwell','josh',None)
 print(my_user.save_to_db())
 
